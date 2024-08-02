@@ -1,0 +1,10 @@
+[workspace]
+
+members = [
+    "spotflow",
+    "spotflow-c",
+    "spotflow-py",
+]
+
+[profile.release.package.spotflow-c]
+opt-level = "s"

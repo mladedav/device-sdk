@@ -1,0 +1,9 @@
+c.db*
+example
+example.o
+spotflow.h
+CMakeFiles
+CMakeCache.txt
+build
+win
+wsl

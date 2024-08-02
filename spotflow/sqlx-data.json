@@ -1,0 +1,551 @@
+{
+  "db": "SQLite",
+  "016e6a81bd065b035dbd9bcda57efda6a210d403620fb3c21ca374df3aca423a": {
+    "describe": {
+      "columns": [
+        {
+          "name": "token",
+          "ordinal": 0,
+          "type_info": "Text"
+        },
+        {
+          "name": "expiration: DateTime<Utc>",
+          "ordinal": 1,
+          "type_info": "Text"
+        }
+      ],
+      "nullable": [
+        false,
+        true
+      ],
+      "parameters": {
+        "Right": 0
+      }
+    },
+    "query": "SELECT registration_token AS token, rt_expiration AS \"expiration: DateTime<Utc>\" FROM SdkConfiguration WHERE id = \"0\""
+  },
+  "0920e4ef5c700696567b5c533b7838408a22b60118a23c0d75f2f569a8afa101": {
+    "describe": {
+      "columns": [
+        {
+          "name": "db_version",
+          "ordinal": 0,
+          "type_info": "Text"
+        }
+      ],
+      "nullable": [
+        false
+      ],
+      "parameters": {
+        "Right": 0
+      }
+    },
+    "query": "SELECT db_version FROM SdkConfiguration WHERE id = \"0\""
+  },
+  "1781ed947f7d067bb5c4f48dd395f8328d5ac2eabd29410e28b7ffb71c020ecf": {
+    "describe": {
+      "columns": [
+        {
+          "name": "id",
+          "ordinal": 0,
+          "type_info": "Int"
+        }
+      ],
+      "nullable": [
+        false
+      ],
+      "parameters": {
+        "Right": 1
+      }
+    },
+    "query": "INSERT INTO CloudToDeviceMessages (content) VALUES (?);\n            SELECT last_insert_rowid() as id"
+  },
+  "1fbd272f15e20dc1eba318bb2e7412c741edef2cc057f4f05e446b225e2cff1d": {
+    "describe": {
+      "columns": [],
+      "nullable": [],
+      "parameters": {
+        "Right": 2
+      }
+    },
+    "query": "DELETE FROM CloudToDeviceProperties WHERE message_id = ?;\n            DELETE FROM CloudToDeviceMessages WHERE id = ?"
+  },
+  "25fc193fc58488b19e38849913f9e4d825deb2a762f205b8d2e60d1ce7cb2f35": {
+    "describe": {
+      "columns": [],
+      "nullable": [],
+      "parameters": {
+        "Right": 0
+      }
+    },
+    "query": "PRAGMA foreign_keys = ON;\n\nCREATE TABLE IF NOT EXISTS Messages (\n    id                  INTEGER PRIMARY KEY AUTOINCREMENT,\n    site_id             TEXT,\n    stream_group        TEXT,\n    stream              TEXT,\n    batch_id            TEXT,\n    message_id          TEXT,\n    content             BLOB NOT NULL,\n    close_option        TEXT NOT NULL,\n    compression         TEXT NOT NULL,\n    batch_slice_id      TEXT,\n    chunk_id            TEXT\n) STRICT;\n\nCREATE TABLE IF NOT EXISTS CloudToDeviceMessages (\n    id INTEGER PRIMARY KEY AUTOINCREMENT,\n    content BLOB NOT NULL\n) STRICT;\n\nCREATE TABLE IF NOT EXISTS CloudToDeviceProperties (\n    message_id INTEGER NOT NULL,\n    key TEXT NOT NULL,\n    value TEXT NOT NULL,\n\n    UNIQUE(message_id, key),\n    FOREIGN KEY(message_id) REFERENCES CloudToDeviceMessages(id)\n) STRICT;\n\nCREATE TABLE IF NOT EXISTS Twins (\n    id                  INTEGER PRIMARY KEY AUTOINCREMENT,\n    type                TEXT NOT NULL,\n    properties          TEXT NOT NULL -- JSON\n) STRICT;\n\nCREATE TABLE IF NOT EXISTS ReportedPropertiesUpdates (\n    id                  INTEGER PRIMARY KEY AUTOINCREMENT,\n    update_type         TEXT NOT NULL, -- UpdateType enum\n    patch               TEXT NOT NULL\n) STRICT;\n\nCREATE TABLE IF NOT EXISTS _Channel (\n    id                  INTEGER PRIMARY KEY AUTOINCREMENT,\n    type                TEXT NOT NULL,\n    value               TEXT NOT NULL -- JSON\n) STRICT;\n\nCREATE TABLE IF NOT EXISTS SdkConfiguration (\n    id                  INTEGER PRIMARY KEY,\n    db_version          TEXT NOT NULL,\n    instance_url        TEXT NOT NULL,\n    provisioning_token  TEXT NOT NULL,\n    registration_token  TEXT NOT NULL,\n    rt_expiration       TEXT, -- DATETIME\n    requested_device_id TEXT,\n    workspace_id        TEXT NOT NULL,\n    device_id           TEXT NOT NULL\n) STRICT;\n"
+  },
+  "38c7a9603fcfabe936fd5c03aae9f50e40b0cad39d324e9fff2261cc6d8c50f8": {
+    "describe": {
+      "columns": [],
+      "nullable": [],
+      "parameters": {
+        "Right": 2
+      }
+    },
+    "query": "INSERT INTO Twins (type, properties) VALUES (?, ?);"
+  },
+  "444c46594ee39f95484c1e658946add7ee1468217d4c937ca12f414de25b3517": {
+    "describe": {
+      "columns": [
+        {
+          "name": "cnt",
+          "ordinal": 0,
+          "type_info": "Int"
+        }
+      ],
+      "nullable": [
+        false
+      ],
+      "parameters": {
+        "Right": 0
+      }
+    },
+    "query": "SELECT COUNT(id) as cnt FROM Messages"
+  },
+  "494e47f4d1803b4a1d3a10d261d999b00a64c6434523986f37c77812296f9a21": {
+    "describe": {
+      "columns": [],
+      "nullable": [],
+      "parameters": {
+        "Right": 1
+      }
+    },
+    "query": "UPDATE SdkConfiguration SET workspace_id = ? WHERE id = \"0\""
+  },
+  "51cdfb8ebce4241862eaab65df7325e56737fcc36dc96e0e9577acd988ebcc29": {
+    "describe": {
+      "columns": [
+        {
+          "name": "id",
+          "ordinal": 0,
+          "type_info": "Int"
+        }
+      ],
+      "nullable": [
+        false
+      ],
+      "parameters": {
+        "Right": 2
+      }
+    },
+    "query": "INSERT INTO ReportedPropertiesUpdates (patch, update_type) VALUES (?, ?);\n            SELECT last_insert_rowid() as id"
+  },
+  "54d9bb5df9d93391ebd79d37fb92a53693029d93b83db221e506c5c64d4fd92d": {
+    "describe": {
+      "columns": [],
+      "nullable": [],
+      "parameters": {
+        "Right": 0
+      }
+    },
+    "query": "DELETE FROM Messages WHERE id = (SELECT id FROM Messages ORDER BY id LIMIT 1)"
+  },
+  "5cd14a1a7916feeffa6cb5e67af297a8ab001ca6f75513b468266c8dfd59f139": {
+    "describe": {
+      "columns": [],
+      "nullable": [],
+      "parameters": {
+        "Right": 2
+      }
+    },
+    "query": "UPDATE SdkConfiguration SET registration_token = ?, rt_expiration = ? WHERE id = \"0\""
+  },
+  "629dde20501376e4ecde9c1df926a5f0e11d944c7aea1497e98a5066af93b244": {
+    "describe": {
+      "columns": [
+        {
+          "name": "id?: i32",
+          "ordinal": 0,
+          "type_info": "Int64"
+        },
+        {
+          "name": "site_id",
+          "ordinal": 1,
+          "type_info": "Text"
+        },
+        {
+          "name": "stream_group",
+          "ordinal": 2,
+          "type_info": "Text"
+        },
+        {
+          "name": "stream",
+          "ordinal": 3,
+          "type_info": "Text"
+        },
+        {
+          "name": "batch_id",
+          "ordinal": 4,
+          "type_info": "Text"
+        },
+        {
+          "name": "message_id",
+          "ordinal": 5,
+          "type_info": "Text"
+        },
+        {
+          "name": "content",
+          "ordinal": 6,
+          "type_info": "Blob"
+        },
+        {
+          "name": "close_option!: CloseOption",
+          "ordinal": 7,
+          "type_info": "Text"
+        },
+        {
+          "name": "compression!: Compression",
+          "ordinal": 8,
+          "type_info": "Text"
+        },
+        {
+          "name": "batch_slice_id",
+          "ordinal": 9,
+          "type_info": "Text"
+        },
+        {
+          "name": "chunk_id",
+          "ordinal": 10,
+          "type_info": "Text"
+        }
+      ],
+      "nullable": [
+        false,
+        true,
+        true,
+        true,
+        true,
+        true,
+        false,
+        false,
+        false,
+        true,
+        true
+      ],
+      "parameters": {
+        "Right": 1
+      }
+    },
+    "query": "SELECT id AS \"id?: i32\", site_id, stream_group, stream, batch_id, message_id, content, close_option AS \"close_option!: CloseOption\", compression AS \"compression!: Compression\", batch_slice_id, chunk_id FROM Messages WHERE id > ? ORDER BY id LIMIT 100"
+  },
+  "6f292af16aec05452e880d06148426e420f56bec4c3a3c18835a0e47e4e3d0ff": {
+    "describe": {
+      "columns": [
+        {
+          "name": "properties",
+          "ordinal": 0,
+          "type_info": "Text"
+        }
+      ],
+      "nullable": [
+        false
+      ],
+      "parameters": {
+        "Right": 1
+      }
+    },
+    "query": "SELECT properties FROM Twins WHERE type = ? ORDER BY id DESC LIMIT 1"
+  },
+  "758fb813036e8a388f0364b890b452814ed8b9f1d6fdaae76a64464064585239": {
+    "describe": {
+      "columns": [
+        {
+          "name": "requested_device_id",
+          "ordinal": 0,
+          "type_info": "Text"
+        }
+      ],
+      "nullable": [
+        true
+      ],
+      "parameters": {
+        "Right": 0
+      }
+    },
+    "query": "SELECT requested_device_id FROM SdkConfiguration WHERE id = \"0\""
+  },
+  "87ec9c291af11a9b2aea4e8d163f630169ca76dc384c8ea645eadc087418b49f": {
+    "describe": {
+      "columns": [],
+      "nullable": [],
+      "parameters": {
+        "Right": 1
+      }
+    },
+    "query": "UPDATE SdkConfiguration SET provisioning_token = ? WHERE id = \"0\""
+  },
+  "88bf07e0d8710666724d5d9f90a3a65228d654e9e981fecb6b138bc596fe321a": {
+    "describe": {
+      "columns": [
+        {
+          "name": "id?: i32",
+          "ordinal": 0,
+          "type_info": "Int64"
+        },
+        {
+          "name": "content",
+          "ordinal": 1,
+          "type_info": "Blob"
+        }
+      ],
+      "nullable": [
+        false,
+        false
+      ],
+      "parameters": {
+        "Right": 1
+      }
+    },
+    "query": "SELECT id AS \"id?: i32\", content FROM CloudToDeviceMessages WHERE id > ? ORDER BY id LIMIT 1"
+  },
+  "9e0b840883e88acd0f04a4bde97c5bfec6df27e9c5a9b65e599b66843deb45ea": {
+    "describe": {
+      "columns": [],
+      "nullable": [],
+      "parameters": {
+        "Right": 3
+      }
+    },
+    "query": "INSERT INTO CloudToDeviceProperties (message_id, key, value) VALUES (?, ?, ?);"
+  },
+  "a25a039401ee94ab7b3ad6da1cd0e27825bf6c027cc6d8cf2f86aaf8d3983450": {
+    "describe": {
+      "columns": [
+        {
+          "name": "id",
+          "ordinal": 0,
+          "type_info": "Int"
+        }
+      ],
+      "nullable": [
+        false
+      ],
+      "parameters": {
+        "Right": 10
+      }
+    },
+    "query": "INSERT INTO Messages (site_id, stream_group, stream, batch_id, message_id, content, close_option, compression, batch_slice_id, chunk_id) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?);\n            SELECT last_insert_rowid() as id"
+  },
+  "a5224dd817e243c09359af4f3f36f108572fd7a3ccba34ce60c033ff8b84505d": {
+    "describe": {
+      "columns": [
+        {
+          "name": "count",
+          "ordinal": 0,
+          "type_info": "Int"
+        }
+      ],
+      "nullable": [
+        false
+      ],
+      "parameters": {
+        "Right": 0
+      }
+    },
+    "query": "SELECT count(id) AS count FROM ReportedPropertiesUpdates"
+  },
+  "aee8e454a14ba4218359b9d2835540e7710a7b4256d6a3a0b1af8394a566c26f": {
+    "describe": {
+      "columns": [
+        {
+          "name": "device_id",
+          "ordinal": 0,
+          "type_info": "Text"
+        }
+      ],
+      "nullable": [
+        false
+      ],
+      "parameters": {
+        "Right": 0
+      }
+    },
+    "query": "SELECT device_id FROM SdkConfiguration WHERE id = \"0\""
+  },
+  "b19183cdf6a13c56fc8b75cda24baf81f85fb26cca0a953fd09175b3662dd536": {
+    "describe": {
+      "columns": [
+        {
+          "name": "workspace_id",
+          "ordinal": 0,
+          "type_info": "Text"
+        }
+      ],
+      "nullable": [
+        false
+      ],
+      "parameters": {
+        "Right": 0
+      }
+    },
+    "query": "SELECT workspace_id FROM SdkConfiguration WHERE id = \"0\""
+  },
+  "b8a3ff137ebd7a60107dbd18b8da65e0ad00ee3e99b6887675ab6a9b96714628": {
+    "describe": {
+      "columns": [
+        {
+          "name": "message_id",
+          "ordinal": 0,
+          "type_info": "Int64"
+        },
+        {
+          "name": "key",
+          "ordinal": 1,
+          "type_info": "Text"
+        },
+        {
+          "name": "value",
+          "ordinal": 2,
+          "type_info": "Text"
+        }
+      ],
+      "nullable": [
+        false,
+        false,
+        false
+      ],
+      "parameters": {
+        "Right": 1
+      }
+    },
+    "query": "SELECT message_id, key, value FROM CloudToDeviceProperties WHERE message_id = ?"
+  },
+  "ba8777a2582610b015a42f720bc455979e93a8aafb8bd83a05bfc2396f4a82ce": {
+    "describe": {
+      "columns": [
+        {
+          "name": "id?: i32",
+          "ordinal": 0,
+          "type_info": "Int64"
+        },
+        {
+          "name": "patch",
+          "ordinal": 1,
+          "type_info": "Text"
+        },
+        {
+          "name": "update_type: ReportedPropertiesUpdateType",
+          "ordinal": 2,
+          "type_info": "Text"
+        }
+      ],
+      "nullable": [
+        false,
+        false,
+        false
+      ],
+      "parameters": {
+        "Right": 1
+      }
+    },
+    "query": "SELECT id AS \"id?: i32\", patch, update_type AS \"update_type: ReportedPropertiesUpdateType\" FROM ReportedPropertiesUpdates WHERE id > ? ORDER BY id LIMIT 1"
+  },
+  "bd7c7f720232691f3c6ca176bb2a367bb842c3059ac6e39fd169e716b9011c83": {
+    "describe": {
+      "columns": [],
+      "nullable": [],
+      "parameters": {
+        "Right": 1
+      }
+    },
+    "query": "UPDATE SdkConfiguration SET device_id = ? WHERE id = \"0\""
+  },
+  "c46e5d23d8841c9845307f649465c2d0384d72e2783a1b316484ade8ff542f7a": {
+    "describe": {
+      "columns": [
+        {
+          "name": "COUNT(*)",
+          "ordinal": 0,
+          "type_info": "Int"
+        }
+      ],
+      "nullable": [
+        false
+      ],
+      "parameters": {
+        "Right": 0
+      }
+    },
+    "query": "SELECT COUNT(*)\n            FROM pragma_table_info('Messages')\n            WHERE name = 'batch_slice_id' OR name = 'chunk_id'"
+  },
+  "cecc5bb945859813f6360729d671433af8c5f018f59b6addae982ea58bb758b6": {
+    "describe": {
+      "columns": [
+        {
+          "name": "cnt",
+          "ordinal": 0,
+          "type_info": "Int"
+        }
+      ],
+      "nullable": [
+        false
+      ],
+      "parameters": {
+        "Right": 0
+      }
+    },
+    "query": "SELECT COUNT(id) as cnt FROM CloudToDeviceMessages"
+  },
+  "d5fda69545ca253fa9a8b7f6bd30f1564f71faa9ffa7efd6938fcd42af8c6bf4": {
+    "describe": {
+      "columns": [],
+      "nullable": [],
+      "parameters": {
+        "Right": 9
+      }
+    },
+    "query": "INSERT OR REPLACE INTO SdkConfiguration (id, db_version, instance_url, provisioning_token, registration_token, rt_expiration, requested_device_id, workspace_id, device_id) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)"
+  },
+  "d94cdf8f0387453ea47500bd23557342d56b535235c4bfc943bfd4b952beb567": {
+    "describe": {
+      "columns": [
+        {
+          "name": "token",
+          "ordinal": 0,
+          "type_info": "Text"
+        }
+      ],
+      "nullable": [
+        false
+      ],
+      "parameters": {
+        "Right": 0
+      }
+    },
+    "query": "SELECT provisioning_token AS token FROM SdkConfiguration WHERE id = \"0\""
+  },
+  "df74575abbaaf1736d2c602f1766108a22e7272aab686ed84c8976a5dbcab63b": {
+    "describe": {
+      "columns": [
+        {
+          "name": "instance_url",
+          "ordinal": 0,
+          "type_info": "Text"
+        }
+      ],
+      "nullable": [
+        false
+      ],
+      "parameters": {
+        "Right": 0
+      }
+    },
+    "query": "SELECT instance_url FROM SdkConfiguration WHERE id = \"0\""
+  },
+  "f197e8146846d97b254fdc29e824dd4fab7f6b39a43511e23c093e9551f3a3cb": {
+    "describe": {
+      "columns": [],
+      "nullable": [],
+      "parameters": {
+        "Right": 1
+      }
+    },
+    "query": "DELETE FROM ReportedPropertiesUpdates WHERE id = ?"
+  }
+}
