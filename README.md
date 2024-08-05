@@ -1,8 +1,5 @@
 <h1 align="center">Device SDK for Spotflow IoT Platform</h1>
 
-> [!NOTE]
-> This repository has been discontinued. The Device SDK now being developed in the [spotflow-io/device-sdk](https://github.com/spotflow-io/device-sdk) repository.
-
 <p align="center">
     <a href="#languages">Languages</a> |
     <a href="#features">Features</a> |
