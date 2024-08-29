@@ -134,7 +134,7 @@ impl Provisioning {
             })?
             .into_json()
             .context("Failed deserializing response from JSON")
-            .map_err(|e| e.into())
+            .map_err(Into::into)
     }
 
     pub fn complete(&mut self, operation_id: &str) -> Result<RegistrationToken, CompletionError> {
@@ -192,7 +192,7 @@ pub fn refresh(
         })?
         .into_json()
         .context("Failed deserializing response from JSON")
-        .map_err(|e| e.into())
+        .map_err(Into::into)
 }
 
 #[cfg(test)]
@@ -226,7 +226,7 @@ mod tests {
             instance_uri = format!("https://{instance_uri}");
         }
 
-        let instance_url: Uri = instance_uri
+        let instance_uri: Uri = instance_uri
             .parse()
             .expect("Invalid instance URL: '{instance_uri}'");
 
@@ -235,7 +235,7 @@ mod tests {
         );
         let pt = ProvisioningToken { token: pt };
 
-        let mut provisioning = Provisioning::new(instance_url.clone(), pt);
+        let mut provisioning = Provisioning::new(instance_uri.clone(), pt);
         provisioning.with_device_id(device_id);
         let init = provisioning
             .init()
@@ -251,7 +251,7 @@ mod tests {
         assert!(matches!(result, Err(CompletionError::NotReady)));
 
         // Approve will normally happen out of band by manual operator calls
-        approve_provisioning(&instance_url, &workspace_id, &operation)
+        approve_provisioning(&instance_uri, &workspace_id, &operation)
             .expect("Unable to approve operation");
 
         let result = provisioning.complete(&operation);
@@ -275,7 +275,7 @@ mod tests {
             expiration: result.expiration,
         };
 
-        let res = register(&instance_url, &rt).expect("Unable to register device.");
+        let res = register(&instance_uri, &rt).expect("Unable to register device.");
         println!("{res:#?}");
     }
 
